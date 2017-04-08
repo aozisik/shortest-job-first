@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shrortest Job First</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="pull-right text-right">
+            <br>
+            <p>
+                <b>Hazırlayan:</b> Ahmet Özışık
+                <br>
+                <b>Öğrenci No:</b> 1650E13123
+                <br>
+                <b>Tarih:</b> 19 Mart 2017
+            </p>
+        </div>
+        <h3>EBT523 - İŞLETİM SİSTEMLERİ</h3>
+        <h4>1. Ödev</h4>
+        <h5>a) Proseslerin CPU tarafından nasıl işletildiklerini grafiksel olarak gösteriniz</h5>
+        <p>
+            SJF algoritması, hazır kuyruğuna gelen proseslerin arasından servis süresi en düşük prosesi seçer ve onu işletir. Algoritmanın kesen tipte olması, mevcutta bir proses işletiliyor olsa dahi bu prosesin kalan işlem süresinden daha kısa servis süreli bir proses hazır kuyruğuna gelirse işlemin yarıda kesilerek daha kısa olan o işleme geçileceği anlamına gelir. Buna göre verilen proses listesinin işletilme biçimi aşağıdaki gibi olur.
+        </p>
+        <table id="processGraph" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th width="10"></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <hr>
+        <div class="row">
+            <div class="col-xs-2 col-xs-offset-8 text-center">
+                <div class="wait"></div> &nbsp; Bekletilen proses
+            </div>
+            <div class="col-xs-2 text-center">
+                <div class="do"></div> &nbsp; Aktif proses
+            </div>
+        </div>
+        <h5>b) P0 prosesinin bekleme süresini hesaplayınız</h5>
+        <p>P0 prosesi, varır varmaz işletilmeye başlanmış olsa dahi daha sonra P3 prosesi tarafından kesilmiştir. Bu kesilme nedeniyle P0 prosesi toplamda <b>4 cycle</b> bekletilmiştir.</p>
+        <h5>c) P0 prosesinin bitiş süresini hesaplayınız</h5>
+        <p>P0 prosesi bekleme zamanıyla birlikte toplamda <b>10 cycle</b> içerisinde tamamlanmıştır.</p>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="job.js"></script>
+    <script>
+    const jobs = [
+        new Job('P0', 0, 6),
+        new Job('P1', 6, 7),
+        new Job('P2', 10, 2),
+        new Job('P3', 1, 4)
+    ];
+
+    let t = 0;
+    while (_.filter(jobs, job => job.done()).length < jobs.length) {
+        const ready = _.filter(jobs, job => job.ready(t));
+        const sj = _.minBy(ready, job => job.remaining());
+        const hanging = _.without(ready, sj);
+        _.each(hanging, job => job.wait());
+        sj.do();
+        t++;
+    }
+
+    $(document).ready(function() {
+        _.each(jobs, (job) => {
+            $('#processGraph > tbody').append('<tr id="' + job.name + '"><td>' + job.name + '</td></tr>');
+        });
+
+        for (var i = 0; i < t; i++) {
+            $('#processGraph > thead > tr').append('<th width="50" class="text-center">T' + i + '</th>');
+            _.each(jobs, (job) => {
+                $('#' + job.name).append('<td><div class="' + job.log[i] + '"></div></td>');
+            });
+        }
+    });
+    </script>
+</body>
+</html>
